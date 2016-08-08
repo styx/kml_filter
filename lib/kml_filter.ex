@@ -5,9 +5,8 @@ defmodule KmlFilter do
   def main(_args) do
     doc   = File.read!("kml/doc.kml")
     total = File.read!("kml/total.kml")
-    newz = File.read!("kml/new.kml")
     minsk_zhodino_big = File.read!("kml/minsk_zhodino_big.kml")
-    process(doc, total, minsk_zhodino_big, newz)
+    process(doc, total, minsk_zhodino_big)
   end
 
   def append0(e) do
@@ -43,7 +42,7 @@ defmodule KmlFilter do
     )
   end
 
-  def process(doc, total, minsk_zhodino_big, newz) do
+  def process(doc, total, minsk_zhodino_big) do
     docSet = doc |> doc_to_set
     totalSet = total |> doc_to_set
     minskZhodinoSet = minsk_zhodino_big |> to_kml_map
@@ -66,14 +65,14 @@ defmodule KmlFilter do
 
   def point_to_xml(point) do
     """
-      <Placemark>
-        <description>#{point.description}</description>
-        <styleUrl>#{point.styleUrl}</styleUrl>
-        <name>#{point.name}</name>
-        <Point>
-            <coordinates>#{point.coordinates}</coordinates>
-        </Point>
-      </Placemark>
+    <Placemark>
+      <description>#{point.description}</description>
+      <styleUrl>#{point.styleUrl}</styleUrl>
+      <name>#{point.name}</name>
+      <Point>
+        <coordinates>#{point.coordinates}</coordinates>
+      </Point>
+    </Placemark>
     """
   end
 
@@ -93,7 +92,7 @@ defmodule KmlFilter do
 
   def produce_new_kml(big, remove) do
     {:ok, f} = File.open("kml/new.kml", [:write])
-    IO.binwrite(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n <Document>\n")
+    IO.binwrite(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n")
 
     write_kml_points(f, big, remove)
 
