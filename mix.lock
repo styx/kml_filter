@@ -1,1 +1,2 @@
-%{"exmerl": {:hex, :exmerl, "0.1.1", "9c9f426b947f483c4e09fa1557b0cb9ac8979d6776d5fc5b273feca0d0e6e7db", [:make, :mix], []}}
+%{"exmerl": {:hex, :exmerl, "0.1.1", "9c9f426b947f483c4e09fa1557b0cb9ac8979d6776d5fc5b273feca0d0e6e7db", [:make, :mix], []},
+  "sweet_xml": {:hex, :sweet_xml, "0.6.1", "a56f235171f35a32807ce44798dedc748ce249fca574674fecd29c1321cab0de", [:mix], []}}
