@@ -39,6 +39,7 @@ defmodule KmlFilter do
       styleUrl: ~x"./styleUrl/text()"s,
       description: ~x"./description/text()"s,
       coordinates: ~x"./Point/coordinates/text()"s |> transform_by(&transform_coordinates/1),
+      orig_coordinates: ~x"./Point/coordinates/text()"s,
     )
   end
 
@@ -65,14 +66,14 @@ defmodule KmlFilter do
 
   def point_to_xml(point) do
     """
-    <Placemark>
-      <description>#{point.description}</description>
-      <styleUrl>#{point.styleUrl}</styleUrl>
-      <name>#{point.name}</name>
-      <Point>
-        <coordinates>#{point.coordinates}</coordinates>
-      </Point>
-    </Placemark>
+            <Placemark>
+                <description><![CDATA[#{point.description}]]></description>
+                <styleUrl>#{point.styleUrl}</styleUrl>
+                <name>#{point.name}</name>
+                <Point>
+                    <coordinates>#{point.orig_coordinates}</coordinates>
+                </Point>
+            </Placemark>
     """
   end
 
@@ -92,11 +93,80 @@ defmodule KmlFilter do
 
   def produce_new_kml(big, remove) do
     {:ok, f} = File.open("kml/new.kml", [:write])
-    IO.binwrite(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n")
+    IO.binwrite(f,
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://www.opengis.net/kml/2.2">
+        <Document>
+            <name>Import from IITC</name>
+    """)
 
     write_kml_points(f, big, remove)
 
-    IO.binwrite(f, "\n<Style id=\"none-inactive\"><IconStyle><Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon><color>B00066FF</color></IconStyle><LabelStyle><scale>0</scale></LabelStyle><BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle></Style><Style id=\"none-active\"><IconStyle><Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon><color>B00066FF</color></IconStyle><LabelStyle><scale>1</scale></LabelStyle><BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle></Style><StyleMap id=\"none\"><Pair><key>normal</key><styleUrl>#none-inactive</styleUrl></Pair><Pair><key>highlight</key><styleUrl>#none-active</styleUrl></Pair></StyleMap><Style id=\"res-inactive\"><IconStyle><Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon><color>B0D09205</color></IconStyle><LabelStyle><scale>0</scale></LabelStyle><BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle></Style><Style id=\"res-active\"><IconStyle><Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon><color>B0D09205</color></IconStyle><LabelStyle><scale>1</scale></LabelStyle><BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle></Style><StyleMap id=\"res\"><Pair><key>normal</key><styleUrl>#res-inactive</styleUrl></Pair><Pair><key>highlight</key><styleUrl>#res-active</styleUrl></Pair></StyleMap><Style id=\"enl-inactive\"><IconStyle><Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon><color>B002BF02</color></IconStyle><LabelStyle><scale>0</scale></LabelStyle><BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle></Style><Style id=\"enl-active\"><IconStyle><Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon><color>B002BF02</color></IconStyle><LabelStyle><scale>1</scale></LabelStyle><BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle></Style><StyleMap id=\"enl\"><Pair><key>normal</key><styleUrl>#enl-inactive</styleUrl></Pair><Pair><key>highlight</key><styleUrl>#enl-active</styleUrl></Pair></StyleMap>\n</Document>\n</kml>")
+    IO.binwrite(f, """
+        <Style id="none-inactive">
+          <IconStyle>
+            <Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon>
+            <color>B00066FF</color>
+          </IconStyle>
+          <LabelStyle><scale>0</scale></LabelStyle>
+          <BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle>
+        </Style>
+        <Style id="none-active">
+          <IconStyle>
+            <Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon>
+            <color>B00066FF</color>
+          </IconStyle>
+          <LabelStyle><scale>1</scale></LabelStyle>
+          <BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle>
+        </Style>
+        <StyleMap id="none">
+            <Pair><key>normal</key><styleUrl>#none-inactive</styleUrl></Pair>
+            <Pair><key>highlight</key><styleUrl>#none-active</styleUrl></Pair>
+        </StyleMap>
+        <Style id="res-inactive">
+          <IconStyle>
+            <Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon>
+            <color>B0D09205</color>
+          </IconStyle>
+          <LabelStyle><scale>0</scale></LabelStyle>
+          <BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle>
+        </Style>
+        <Style id="res-active">
+          <IconStyle>
+            <Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon>
+            <color>B0D09205</color>
+          </IconStyle>
+          <LabelStyle><scale>1</scale></LabelStyle>
+          <BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle>
+        </Style>
+        <StyleMap id="res">
+            <Pair><key>normal</key><styleUrl>#res-inactive</styleUrl></Pair>
+            <Pair><key>highlight</key><styleUrl>#res-active</styleUrl></Pair>
+        </StyleMap>
+        <Style id="enl-inactive">
+          <IconStyle>
+            <Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon>
+            <color>B002BF02</color>
+          </IconStyle>
+          <LabelStyle><scale>0</scale></LabelStyle>
+          <BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle>
+        </Style>
+        <Style id="enl-active">
+          <IconStyle>
+            <Icon><href>http://www.gstatic.com/mapspro/images/stock/959-wht-circle-blank.png</href></Icon>
+            <color>B002BF02</color>
+          </IconStyle>
+          <LabelStyle><scale>1</scale></LabelStyle>
+          <BalloonStyle><text><![CDATA[$[description]]]></text></BalloonStyle>
+        </Style>
+        <StyleMap id="enl">
+            <Pair><key>normal</key><styleUrl>#enl-inactive</styleUrl></Pair>
+            <Pair><key>highlight</key><styleUrl>#enl-active</styleUrl></Pair>
+        </StyleMap>
+      </Document>
+    </kml>
+    """)
     File.close(f)
   end
 
